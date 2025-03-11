@@ -10,10 +10,16 @@ import signup from "./middlewares/signup.js";
 import refreshToken from "./middlewares/refreshToken.js";
 const app = express();
 app.use(express.json());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      process.env.NODE_ENV === "production" ? undefined : false,
+  })
+);
 const allowedOrigins = [
   "http://localhost:5173",
   "https://frontend2.example.com",
+  "http://localhost:8080",
 ];
 app.use(
   cors({
@@ -21,6 +27,7 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
+        console.log(origin);
         return callback(new Error("Not allowed by CORS"), false);
       }
       return callback(null, true);
